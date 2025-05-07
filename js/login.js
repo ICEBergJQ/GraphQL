@@ -23,7 +23,7 @@ function addLoginEvent() {
 
 
     button.addEventListener('click', login());
-    document.body.addEventListener('keypress', function (e) {
+    document.body.addEventListener('keyup', function (e) {
         if (e.key === 'Enter') {
           login();
         }
