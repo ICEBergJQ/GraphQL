@@ -15,7 +15,10 @@ export function renderLoginSec() {
         </div>
     </section>
     `;
-    addLoginEvent();
+
+    window.addEventListener('DOMContentLoaded', () => {
+        addLoginEvent();
+      });
 }
 
 function addLoginEvent() {
