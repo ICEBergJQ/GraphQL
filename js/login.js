@@ -1,4 +1,5 @@
 import { renderProfile } from './profile.js';
+import { displayToast } from "./utils.js";
 const container = document.getElementById('Maincontainer');
 
 export function renderLoginSec() {
@@ -8,7 +9,7 @@ export function renderLoginSec() {
             <div class="form-box" id="login">
                 <h2>Login</h2>
                 <input type="text" id="username" placeholder="Enter username or email">
-                <input type="text" id="password" placeholder="Enter password">
+                <input type="password" id="password" placeholder="Enter password">
                 <button class="btn" id="loginbtn" type="submit" >Login</button>
             </div>
         </div>
@@ -37,14 +38,7 @@ function addLoginEvent() {
             localStorage.setItem('jwt', data);
             renderProfile();
         } else {
-            const errorData = await response.json();
-            const errorMsg = document.createElement('div')
-            errorMsg.className = 'error'
-            errorMsg.textContent = errorData.error || 'Invalid credentials';
-            document.body.appendChild(errorMsg);
-            setTimeout(() => {
-                errorMsg.remove();
-            },3000);
+            displayToast("red", 'invalid credentials!')
         }
     });
 }
