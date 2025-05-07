@@ -24,7 +24,7 @@ function addLoginEvent() {
 
     button.addEventListener('click', login());
     document.body.addEventListener('keyup', function (e) {
-        if (e.key === 'Enter') {
+        if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
           login();
         }
     });
