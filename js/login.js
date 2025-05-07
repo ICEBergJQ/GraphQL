@@ -20,17 +20,10 @@ export function renderLoginSec() {
 
 function addLoginEvent() {
     const button = document.getElementById('loginbtn')
-    const username = document.getElementById('username');
-    const password = document.getElementById('password');
 
 
     button.addEventListener('click', login());
-    username.addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-          login();
-        }
-    });
-    password.addEventListener('keypress', function (e) {
+    document.body.addEventListener('keypress', function (e) {
         if (e.key === 'Enter') {
           login();
         }
