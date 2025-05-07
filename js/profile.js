@@ -134,8 +134,10 @@ async function fetchUserData() {
     renderXPGraph(data.data.transaction); // Pass XP transactions to graph
     renderSkillsChart(user.transactions); // Pass skill transactions to bar chart
   } catch (error) {
-    console.error(error);
     displayToast("red","there was an error loading your data logout and try again!");
+    setTimeout(() => {
+      logout();
+    }, 2000);
     // alert("Error fetching data");
   }
 }
