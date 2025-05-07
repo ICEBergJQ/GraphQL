@@ -22,7 +22,7 @@ function addLoginEvent() {
     const button = document.getElementById('loginbtn')
 
 
-    button.addEventListener('click', login());
+    button.addEventListener('click', login);
     document.body.addEventListener('keyup', function (e) {
         if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
           login();
