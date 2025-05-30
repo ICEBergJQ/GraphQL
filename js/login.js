@@ -29,27 +29,40 @@ function addLoginEvent() {
     document.body.addEventListener('keyup', function (e) {
         if (e.key === 'Enter' && document.activeElement.tagName === 'INPUT') {
           login();
+          document.activeElement.blur();
         }
     });
 }
 
-async function  login() {
+let isLoggingIn = false;
+
+async function login() {
+    if (isLoggingIn) return;
+    isLoggingIn = true;
+
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
 
-    const response = await fetch('https://learn.zone01oujda.ma/api/auth/signin', {
-        method: 'POST',
-        headers: {
-            'Authorization': `Basic ${btoa(`${username}:${password}`)}`,
-            'Content-Type': 'application/json',
-        },
-    });
+    try {
+        const response = await fetch('https://learn.zone01oujda.ma/api/auth/signin/', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Basic ${btoa(`${username}:${password}`)}`,
+                'Content-Type': 'application/json',
+            },
+        });
 
-    if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('jwt', data);
-        renderProfile();
-    } else {
-        displayToast("red", 'invalid credentials!')
+        if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('jwt', data);
+            renderProfile();
+        } else {
+            displayToast("red", 'Invalid credentials!');
+        }
+    } catch (error) {
+        console.error('Login error:', error);
+        displayToast("red", 'An error occurred. Please try again.');
+    } finally {
+        isLoggingIn = false;
     }
 }

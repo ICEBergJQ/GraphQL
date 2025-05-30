@@ -2,6 +2,7 @@ import { displayToast } from "./utils.js";
 import { deduplicateSkills } from "./utils.js";
 import { addProjects } from "./utils.js";
 import { convertXP } from "./utils.js";
+import { showTooltip } from "./utils.js";
 
 const container = document.getElementById("Maincontainer");
 
@@ -40,12 +41,12 @@ export function renderProfile() {
         <div class="container" id="xpc">
         <div class="container" id="box2">
             <h2>XP Graph</h2>
-            <div id="xp-graph"></div> <!-- Graph container -->
+            <div id="xp-graph"></div>
         </div>
         </div>
              <div class="container" id="box5">
                 <h2>Top Skills</h2>
-                <div id="skills-chart"></div> <!-- Bar chart container -->
+                <div id="skills-chart"></div>
             </div>
         </div>
     `;
@@ -86,8 +87,9 @@ async function fetchUserData() {
             Project: transaction(
                     where: {type: {_eq: "xp"}, eventId: {_eq: 41}, object: {type: {_eq: "project"}}}
                     order_by: {createdAt: desc}
-                    limit: 3
+                    limit: 5
                   ) {
+                    amount
                     object {
                       name
                       
@@ -138,7 +140,6 @@ async function fetchUserData() {
     setTimeout(() => {
       logout();
     }, 2000);
-    // alert("Error fetching data");
   }
 }
 
@@ -187,7 +188,7 @@ function renderXPGraph(transactions) {
     svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
     svg.style.width = "100%";
-    svg.style.height = "auto";
+    svg.style.height = "103%";
   
     // Draw axes
     const xAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
@@ -249,20 +250,7 @@ function renderXPGraph(transactions) {
   
       // Tooltip
       circle.addEventListener("mouseenter", (e) => {
-        const tooltip = document.createElement("div");
-        tooltip.className = "tooltip";
-        tooltip.style.position = "absolute";
-        tooltip.style.left = `${e.pageX + 10}px`;
-        tooltip.style.top = `${e.pageY - 10}px`;
-        tooltip.style.background = "rgba(0,0,0,0.75)";
-        tooltip.style.color = "white";
-        tooltip.style.padding = "4px 6px";
-        tooltip.style.fontSize = "12px";
-        tooltip.style.borderRadius = "4px";
-        tooltip.innerHTML = `XP: ${convertXP(point.xp)}<br>${point.date.toLocaleDateString()}`;
-        document.body.appendChild(tooltip);
-  
-        circle.addEventListener("mouseleave", () => tooltip.remove());
+        showTooltip(e,`XP: ${convertXP(point.xp)}<br>${point.date.toLocaleDateString()}`)
       });
   
       svg.appendChild(circle);
@@ -273,97 +261,67 @@ function renderXPGraph(transactions) {
   }
   
 
-
 function renderSkillsChart(transactions) {
   if (!transactions.length) return;
 
-  console.log(transactions);
-
   const topSkills = deduplicateSkills(transactions).slice(0, 6);
 
-  const total = topSkills.reduce((sum, t) => sum + t.amount, 0);
-  const radius = 80;
-  const center = 100;
-  const svgSize = 200;
-  const colors = ["#3498db", "#e67e22", "#2ecc71", "#9b59b6"];
-
+  const svgWidth = 300;
+  const svgHeight = 30 * topSkills.length + 20;
+  const barHeight = 20;
+  const barSpacing = 10;
   const svgNS = "http://www.w3.org/2000/svg";
+
   const svg = document.createElementNS(svgNS, "svg");
   svg.setAttribute("width", "100%");
-  svg.setAttribute("height", "100%");
-  svg.setAttribute("viewBox", `0 0 ${svgSize} ${svgSize}`);
-
-  let cumulativeAngle = 0;
+  svg.setAttribute("height", svgHeight);
+  svg.setAttribute("viewBox", `0 0 ${svgWidth} ${svgHeight}`);
 
   topSkills.forEach((skill, index) => {
-    const value = skill.amount;
-    const angle = (value / total) * 360;
-    const startAngle = cumulativeAngle;
-    const endAngle = cumulativeAngle + angle;
-    const midAngle = (startAngle + endAngle) / 2;
-    cumulativeAngle += angle;
+    const y = index * (barHeight + barSpacing) + 10;
 
-    // Coordinates for arc
-    const x1 = center + radius * Math.cos(((startAngle - 90) * Math.PI) / 180);
-    const y1 = center + radius * Math.sin(((startAngle - 90) * Math.PI) / 180);
-    const x2 = center + radius * Math.cos(((endAngle - 90) * Math.PI) / 180);
-    const y2 = center + radius * Math.sin(((endAngle - 90) * Math.PI) / 180);
+    // Background bar (optional)
+    const bgBar = document.createElementNS(svgNS, "rect");
+    bgBar.setAttribute("x", 100);
+    bgBar.setAttribute("y", y);
+    bgBar.setAttribute("width", svgWidth - 120);
+    bgBar.setAttribute("height", barHeight);
+    bgBar.setAttribute("fill", "#eee");
+    svg.appendChild(bgBar);
 
-    const largeArcFlag = angle > 180 ? 1 : 0;
+    // Foreground (filled) bar
+    const fgBar = document.createElementNS(svgNS, "rect");
+    fgBar.setAttribute("x", 100);
+    fgBar.setAttribute("y", y);
+    fgBar.setAttribute("width", ((svgWidth - 120) * skill.amount) / 100);
+    fgBar.setAttribute("height", barHeight);
+    fgBar.setAttribute("fill", "#3498db");
+    fgBar.style.cursor = "pointer";
+    fgBar.addEventListener("mouseover", (e) =>
+      showTooltip(e, `${skill.type.replace("skill_", "")}: ${skill.amount}%`)
+    );
+    svg.appendChild(fgBar);
 
-    // Draw slice
-    const pathData = [
-      `M ${center} ${center}`,
-      `L ${x1} ${y1}`,
-      `A ${radius} ${radius} 0 ${largeArcFlag} 1 ${x2} ${y2}`,
-      "Z",
-    ].join(" ");
-
-    const path = document.createElementNS(svgNS, "path");
-    path.setAttribute("d", pathData);
-    path.setAttribute("fill", colors[index % colors.length]);
-    path.style.cursor = "pointer";
-
-    // Hover tooltip
-    path.addEventListener("mouseover", (e) => {
-      const tooltip = document.createElement("div");
-      tooltip.className = "tooltip";
-      tooltip.style.position = "absolute";
-      tooltip.style.left = `${e.pageX + 10}px`;
-      tooltip.style.top = `${e.pageY - 10}px`;
-      tooltip.style.padding = "5px 8px";
-      tooltip.style.borderRadius = "4px";
-      tooltip.style.background = "black";
-      tooltip.style.color = "white";
-      tooltip.style.fontSize = "12px";
-      tooltip.textContent = `${skill.type.replace("skill_", "")}: ${
-        skill.amount
-      } %`;
-      document.body.appendChild(tooltip);
-
-      path.addEventListener("mouseout", () => tooltip.remove());
-    });
-
-    svg.appendChild(path);
-
-    // Label inside slice
-    const labelRadius = radius * 0.6;
-    const labelX =
-      center + labelRadius * Math.cos(((midAngle - 90) * Math.PI) / 180);
-    const labelY =
-      center + labelRadius * Math.sin(((midAngle - 90) * Math.PI) / 180);
-
+    // Skill label on the left
     const label = document.createElementNS(svgNS, "text");
-    label.setAttribute("x", labelX);
-    label.setAttribute("y", labelY);
-    label.setAttribute("text-anchor", "middle");
+    label.setAttribute("x", 95);
+    label.setAttribute("y", y + barHeight / 2);
+    label.setAttribute("text-anchor", "end");
     label.setAttribute("alignment-baseline", "middle");
-    label.setAttribute("fill", "white");
     label.setAttribute("font-size", "12px");
-    label.setAttribute("pointer-events", "none");
+    label.setAttribute("fill", "#444");
     label.textContent = skill.type.replace("skill_", "");
-
     svg.appendChild(label);
+
+    // skill.amount label on the right of bar
+    const percentLabel = document.createElementNS(svgNS, "text");
+    percentLabel.setAttribute("x", 100 + ((svgWidth - 120) * skill.amount) / 100 + 5);
+    percentLabel.setAttribute("y", y + barHeight / 2);
+    percentLabel.setAttribute("alignment-baseline", "middle");
+    percentLabel.setAttribute("font-size", "12px");
+    percentLabel.setAttribute("fill", "#333");
+    percentLabel.textContent = `${skill.amount}%`;
+    svg.appendChild(percentLabel);
   });
 
   const container = document.getElementById("skills-chart");

@@ -130,16 +130,14 @@ body {
   overflow: visible;
 }
 
-@media (max-width: 600px) {
-  /* #navbar {
-    flex-direction: column;
-    align-items: flex-start;
-  } */
+.prj {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%; /* or a fixed width if needed */
+}
 
-  /* #sec {
-    width: 100%;
-    justify-content: space-between;
-  } */
+@media (max-width: 600px) {
 
   .container {
     padding: 1rem;
