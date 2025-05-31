@@ -32,17 +32,43 @@ export function deduplicateSkills(skills) {
     return Array.from(map.values());
 }
 
+
 export function addProjects(projects) {
-    let prjdiv = document.getElementById('projects');
-    
-    projects.forEach(pr=> {
-      if (pr.amount >= 0) {
-        document.getElementById('projects').innerHTML += `<div class="prj"><p>${pr.object.name}</p><p style="color:green">${convertXP(pr.amount)}</p></div>`
-      } else {
-        document.getElementById('projects').innerHTML += `<div class="prj"><p>${pr.object.name}</p><p style="color:red">${convertXP(pr.amount)}</p></div>`
-      }
+  const prjContainer = document.getElementById('projects');
+  prjContainer.innerHTML = '';
+  console.log(projects);
+  
+  projects.forEach(pr => {
+
+    const prj = document.createElement('div');
+    prj.className = 'prj';
+
+    const name = document.createElement('p');
+    name.textContent = pr.object.name;
+
+    const xp = document.createElement('p');
+    xp.textContent = convertXP(pr.amount);
+     xp.textContent = pr.amount >= 0 ? "+"+convertXP(pr.amount) : convertXP(pr.amount);
+    xp.style.color = pr.amount >= 0 ? 'green' : 'red';
+
+    const tooltipIcon = document.createElement('span');
+    tooltipIcon.innerHTML = '🛈';
+    tooltipIcon.style.cursor = 'pointer';
+    tooltipIcon.className = 'tooltip-icon';
+    tooltipIcon.addEventListener('mouseover', (e) => {
+      showTooltip(e, `Type: ${pr.object.type} <br>Team: ${pr.object?.progresses?.[0]?.group?.members
+                ?.map((m) => m.userLogin || m.login || m.username)
+                .filter(Boolean)
+                .join(", ") || "N/A"}`);
     });
+
+    prj.appendChild(tooltipIcon);
+    prj.appendChild(name);
+    prj.appendChild(xp);
+    prjContainer.appendChild(prj);
+  });
 }
+
 
 export function convertXP(bytes) {
   if (bytes < 0) {

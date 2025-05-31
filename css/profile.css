@@ -119,9 +119,14 @@ body {
   font-size: 1.2rem;
 }
 
+#projects{
+   max-height: 200px;
+   overflow-y: auto;
+   overflow-x: hidden;
+}
+
 /* GRAPH + CHART CONTAINERS */
-#xp-graph,
-#skills-chart {
+#xp-graph {
   align-items: center;
   justify-items: center;
   width: 100%;
@@ -135,16 +140,26 @@ body {
   justify-content: space-between;
   align-items: center;
   width: 100%; /* or a fixed width if needed */
+  background-color: #cfcfcf;
+  border-radius: 5px;
+  padding: 5px;
+  pr {
+    margin-inline: 10px;
+  }
+  margin: 5px;
 }
 
 @media (max-width: 600px) {
-
   .container {
     padding: 1rem;
   }
 
-  #xp-graph,
-  #skills-chart {
-    height: 200px;
+  #skills-chart,
+  #xp-graph {
+    max-height: fit-content;
+  }
+  .svg {
+    width: 100%;
+    max-height: fit-content;
   }
 }
