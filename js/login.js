@@ -54,8 +54,7 @@ async function login() {
 
         if (response.ok) {
             const data = await response.json();
-            localStorage.setItem('jwt', data);
-            renderProfile();
+            await checkIfAuthorized(data)
         } else {
             displayToast("red", 'Invalid credentials!');
         }
@@ -65,4 +64,45 @@ async function login() {
     } finally {
         isLoggingIn = false;
     }
+}
+
+async function checkIfAuthorized(token) {
+  const query = `
+    {
+      user {
+        campus
+      }
+    }`;
+  
+  try {
+    const response = await fetch(
+      "https://learn.zone01oujda.ma/api/graphql-engine/v1/graphql",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          query: query,
+          variables: {}
+        }),
+      }
+    );
+    
+    const data = await response.json();
+    console.log(data);
+    
+    if (!data || !data.data) throw new Error("Failed to fetch user data");
+    
+    const user = data.data.user[0];
+    const campus = user.campus;
+    
+    if (campus === null) throw new Error("unauthorized");
+    
+    localStorage.setItem('jwt', token);
+    renderProfile();
+  } catch (error) {
+    displayToast("red", error);
+  }
 }

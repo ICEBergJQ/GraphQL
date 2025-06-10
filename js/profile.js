@@ -124,6 +124,8 @@ async function fetchUserData() {
     const project = data.data.Project;
 
     if (user) {
+      if (user.campus === null) throw new Error("unauthorized");
+
       addProjects(project);
       document.getElementById("user").textContent = user.login;
       document.getElementById("username").textContent = user.login + "!";
@@ -134,26 +136,25 @@ async function fetchUserData() {
       document.getElementById("audit-ratio").textContent = user.auditRatio
         ? user.auditRatio.toFixed(1)
         : "N/A";
-       document.getElementById("phone").textContent = user.attrs
+      document.getElementById("phone").textContent = user.attrs
         ? user.attrs
         : "N/A";
-        document.getElementById("campus").textContent = user.campus
-        ? user.campus+" campus"
+      document.getElementById("campus").textContent = user.campus
+        ? user.campus + " campus"
         : "N/A";
     }
 
     // Render XP and Level
     renderXp(data);
-    renderXPGraph(data.data.Project); // Pass XP transactions to graph
-    renderSkillsChart(user.transactions); // Pass skill transactions to bar chart
+    renderXPGraph(data.data.Project);
+    renderSkillsChart(user.transactions);
   } catch (error) {
     displayToast(
       "red",
-      "there was an error loading your data logout and try again!"
+      error
     );
-    console.log(error);
     setTimeout(() => {
-      // logout();
+      logout();
     }, 2000);
   }
 }
@@ -170,7 +171,6 @@ function renderXp(data) {
 function renderXPGraph(transactions) {
   if (!transactions.length) return;
   console.log(transactions);
-  
 
   let cumulativeXP = 0;
   const sortedData = transactions.sort(
@@ -178,16 +178,16 @@ function renderXPGraph(transactions) {
   );
 
   const dataPoints = sortedData
-  .filter(transaction => transaction.object.type === "project")
-  .map(transaction => {
-    cumulativeXP += transaction.amount;
-    return {
-      prj : transaction.object.name,
-      date: new Date(transaction.createdAt),
-      amm : transaction.amount,
-      xp: cumulativeXP,
-    };
-  });
+    .filter((transaction) => transaction.object.type === "project")
+    .map((transaction) => {
+      cumulativeXP += transaction.amount;
+      return {
+        prj: transaction.object.name,
+        date: new Date(transaction.createdAt),
+        amm: transaction.amount,
+        xp: cumulativeXP,
+      };
+    });
 
   const width = 400;
   const height = 200;
@@ -282,7 +282,9 @@ function renderXPGraph(transactions) {
     circle.addEventListener("mouseenter", (e) => {
       showTooltip(
         e,
-        `${point.prj}<br>XP: ${point.amm >= 0 ? "+"+convertXP(point.amm) : convertXP(point.amm)}<br>${point.date.toLocaleDateString()}`
+        `${point.prj}<br>XP: ${
+          point.amm >= 0 ? "+" + convertXP(point.amm) : convertXP(point.amm)
+        }<br>${point.date.toLocaleDateString()}`
       );
     });
 
