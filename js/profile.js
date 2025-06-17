@@ -11,7 +11,6 @@ export function renderProfile() {
     <div id="navbar">
         <h1>01QL</h1>
         <div id="sec">
-            <h3 id="user">loading...</h3>
             <button id="logoutbtn">Logout</button>
         </div>
     </div>
@@ -19,7 +18,7 @@ export function renderProfile() {
         <div class="welcome">
             <h1>Welcome Back, <span id="username"></span></h1>
         </div>
-        <div class="container">
+        <div class="container" id="userinfo">
             <h2>User Info:</h2>
             <p id="fullname">Loading...</p>
             <p id="phone">Loading...</p>
@@ -127,20 +126,19 @@ async function fetchUserData() {
       if (user.campus === null) throw new Error("unauthorized");
 
       addProjects(project);
-      document.getElementById("user").textContent = user.login;
       document.getElementById("username").textContent = user.login + "!";
       document.getElementById(
         "fullname"
       ).textContent = `${user.firstName} ${user.lastName}`;
-      document.getElementById("email").textContent = `${user.email}`;
+      document.getElementById("email").textContent = `email: ${user.email}`;
       document.getElementById("audit-ratio").textContent = user.auditRatio
         ? user.auditRatio.toFixed(1)
         : "N/A";
       document.getElementById("phone").textContent = user.attrs
-        ? user.attrs
+        ? "Phone number: "+user.attrs
         : "N/A";
       document.getElementById("campus").textContent = user.campus
-        ? user.campus + " campus"
+        ? "campus: " + user.campus + " campus"
         : "N/A";
     }
 
@@ -170,7 +168,6 @@ function renderXp(data) {
 
 function renderXPGraph(transactions) {
   if (!transactions.length) return;
-  console.log(transactions);
 
   let cumulativeXP = 0;
   const sortedData = transactions.sort(

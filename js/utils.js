@@ -36,7 +36,6 @@ export function deduplicateSkills(skills) {
 export function addProjects(projects) {
   const prjContainer = document.getElementById('projects');
   prjContainer.innerHTML = '';
-  console.log(projects);
   
   projects.forEach(pr => {
 
