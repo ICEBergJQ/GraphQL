@@ -315,7 +315,7 @@ function renderSkillsChart(transactions) {
   topSkills.forEach((skill, index) => {
     const y = index * (barHeight + barSpacing) + 10;
 
-    // Background bar (optional)
+    // Background bar
     const bgBar = document.createElementNS(svgNS, "rect");
     bgBar.setAttribute("x", 100);
     bgBar.setAttribute("y", y);
@@ -324,7 +324,7 @@ function renderSkillsChart(transactions) {
     bgBar.setAttribute("fill", "#eee");
     svg.appendChild(bgBar);
 
-    // Foreground (filled) bar
+    // filled bar
     const fgBar = document.createElementNS(svgNS, "rect");
     fgBar.setAttribute("x", 100);
     fgBar.setAttribute("y", y);
@@ -337,7 +337,7 @@ function renderSkillsChart(transactions) {
     );
     svg.appendChild(fgBar);
 
-    // Skill label on the left
+    // Skill label
     const label = document.createElementNS(svgNS, "text");
     label.setAttribute("x", 95);
     label.setAttribute("y", y + barHeight / 2);

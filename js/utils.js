@@ -52,7 +52,7 @@ export function addProjects(projects) {
     xp.style.color = pr.amount >= 0 ? 'green' : 'red';
 
     const tooltipIcon = document.createElement('span');
-    tooltipIcon.innerHTML = '🛈';
+    tooltipIcon.innerHTML = '&#9432;';
     tooltipIcon.style.cursor = 'pointer';
     tooltipIcon.className = 'tooltip-icon';
     tooltipIcon.addEventListener('mouseover', (e) => {
