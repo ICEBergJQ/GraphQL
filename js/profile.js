@@ -225,7 +225,7 @@ function renderXPGraph(transactions) {
 
   const yAxis = document.createElementNS("http://www.w3.org/2000/svg", "line");
   yAxis.setAttribute("x1", margin);
-  yAxis.setAttribute("y1", margin);
+  yAxis.setAttribute("y1", margin -height);
   yAxis.setAttribute("x2", margin);
   yAxis.setAttribute("y2", height - margin);
   yAxis.setAttribute("stroke", "#999");
