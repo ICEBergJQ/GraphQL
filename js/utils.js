@@ -78,7 +78,7 @@ export function convertXP(bytes) {
   } else {
     if (bytes < 1000) return `${bytes} B`;
     if (bytes < 1000 * 1000) return `${Math.ceil(bytes / 1000)} KB`;
-    return `${Math.ceil(bytes / (1000 * 1000))} MB`;
+    return `${bytes / (1000 * 1000)} MB`;
   }
 }
 
